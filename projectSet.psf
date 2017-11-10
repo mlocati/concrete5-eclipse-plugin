@@ -5,6 +5,9 @@
 <project reference="1.0,git://git.eclipse.org/gitroot/dltk/org.eclipse.dltk.core.git,master,core/plugins/org.eclipse.dltk"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/dltk/org.eclipse.dltk.core.git,master,core/plugins/org.eclipse.dltk.core"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/pdt/org.eclipse.pdt.git,master,plugins/org.eclipse.php.core"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/pdt/org.eclipse.pdt.git,master,plugins/org.eclipse.php.core.parser"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/webtools-common/webtools.common.git,master,plugins/org.eclipse.wst.common.project.facet.ui"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/sourceediting/webtools.sourceediting.git,master,bundles/org.eclipse.wst.css.core"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/sourceediting/webtools.sourceediting.git,master,bundles/org.eclipse.wst.html.core"/>
 </provider>
 </psf>
