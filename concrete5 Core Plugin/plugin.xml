@@ -34,6 +34,14 @@
 	</extension>
 
 	<extension
+		point="org.eclipse.wst.common.project.facet.ui.images">
+		<image
+			facet="php.concrete5.component"
+			path="icons/facet-icon.png"
+		/>
+	</extension>
+
+	<extension
 		id="concrete5Nature"
 		name="concrete5 Project Nature"
 		point="org.eclipse.core.resources.natures">
@@ -50,6 +58,6 @@
 			class="org.concrete5.core.goals.ContainerGoalEvaluatorFactory"
 			priority="100">
 		</factory>
-   </extension>
+	</extension>
 
 </plugin>
