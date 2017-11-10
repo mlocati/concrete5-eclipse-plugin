@@ -3,6 +3,7 @@
 <provider id="org.eclipse.egit.core.GitProvider">
 <project reference="1.0,git://github.com/mlocati/concrete5-eclipse-plugin.git,master,org.concrete5.core"/>
 <project reference="1.0,git://github.com/mlocati/concrete5-eclipse-plugin.git,master,org.concrete5.feature"/>
+<project reference="1.0,git://github.com/mlocati/concrete5-eclipse-plugin.git,gh-pages,."/>
 <project reference="1.0,git://git.eclipse.org/gitroot/dltk/org.eclipse.dltk.core.git,master,core/plugins/org.eclipse.dltk"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/dltk/org.eclipse.dltk.core.git,master,core/plugins/org.eclipse.dltk.core"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/pdt/org.eclipse.pdt.git,master,plugins/org.eclipse.php.core"/>
