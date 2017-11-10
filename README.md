@@ -8,7 +8,15 @@ It still requires some fixes, but it's already very useful.
 
 ## Installation
 
-At the moment, the only way to install the plugin is to go to the [releases](https://github.com/mlocati/concrete5-eclipse-plugin/releases) page, download the latest .jar version and copy it to the Eclipse `plugins` directory.
+1. Open Eclipse
+2. Under the *Help* menu, choose *Install New Software...*
+3. Click the *Add...* button and enter:
+    1. Name: `concrete5 Update Site`
+    2. Location: [`https://mlocati.github.io/concrete5-eclipse-plugin/updatesite`](https://mlocati.github.io/concrete5-eclipse-plugin/updatesite)
+    3. Hit *OK*
+4. In the *Work with* dropdown, select the update site that you just created
+5. Write *concrete5* in the filter text box
+6. Check the `concrete5 Plugin` and proceed with the installation
 
 ## Activation
 
