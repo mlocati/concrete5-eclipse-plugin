@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+	<extension
+		point="org.eclipse.wst.common.project.facet.core.facets">
+		<project-facet
+			id="php.concrete5.component">
+			<label>concrete5</label>
+			<description>Add concrete5 support to your PHP project</description>
+		</project-facet>
+		<project-facet-version
+			facet="php.concrete5.component"
+			version="1.0"
+			>
+			<constraint>
+				<requires facet="php.core.component" />
+			</constraint>
+		</project-facet-version>
+		<action
+			facet="php.concrete5.component"
+			type="install">
+			<delegate
+				class="org.concrete5.core.facet.InstallActionDelegate">
+			</delegate>
+		</action>
+		<action
+			facet="php.concrete5.component"
+			type="uninstall">
+			<delegate
+				class="org.concrete5.core.facet.UninstallActionDelegate">
+			</delegate>
+		</action>
+	</extension>
+
+	<extension
+		id="concrete5Nature"
+		name="concrete5 Project Nature"
+		point="org.eclipse.core.resources.natures">
+		<runtime>
+			<run
+				class="org.concrete5.core.builder.Concrete5Nature">
+			</run>
+		</runtime>
+	</extension>
+
+	<extension
+		point="org.eclipse.php.core.goalEvaluatorFactories">
+		<factory
+			class="org.concrete5.core.goals.ContainerGoalEvaluatorFactory"
+			priority="100">
+		</factory>
+   </extension>
+
+</plugin>
