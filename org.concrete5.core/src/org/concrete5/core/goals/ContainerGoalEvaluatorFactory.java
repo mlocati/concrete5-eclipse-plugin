@@ -42,7 +42,8 @@ public class ContainerGoalEvaluatorFactory implements IGoalEvaluatorFactory {
 		if (methodAgument == null) {
 			return null;
 		}
-		return new ProspectiveFactoryMethodCallTypeEvaluator((ExpressionTypeGoal) goal, flags, methodAgument); 
+		return new ProspectiveFactoryMethodCallTypeEvaluator((ExpressionTypeGoal) goal, flags, methodAgument,
+				expression.sourceStart());
 	}
 
 	/**
@@ -61,7 +62,6 @@ public class ContainerGoalEvaluatorFactory implements IGoalEvaluatorFactory {
 	 * Get the prospective behavior of a factory method call.
 	 * 
 	 * @param call
-	 * @return
 	 */
 	private int getMethodFlags(PHPCallExpression call) {
 		SimpleReference methodNameReference = call.getCallName();
@@ -76,7 +76,8 @@ public class ContainerGoalEvaluatorFactory implements IGoalEvaluatorFactory {
 			return ProspectiveFactoryMethodCallTypeEvaluator.FACTORYMETHOD_CLASSES;
 		}
 		if (methodName.equalsIgnoreCase("make")) { //$NON-NLS-1$
-			return ProspectiveFactoryMethodCallTypeEvaluator.FACTORYMETHOD_CLASSES | ProspectiveFactoryMethodCallTypeEvaluator.FACTORYMETHOD_ALIASES;
+			return ProspectiveFactoryMethodCallTypeEvaluator.FACTORYMETHOD_CLASSES
+					| ProspectiveFactoryMethodCallTypeEvaluator.FACTORYMETHOD_ALIASES;
 		}
 		return ProspectiveFactoryMethodCallTypeEvaluator.FACTORYMETHOD_NONE;
 	}
@@ -108,7 +109,7 @@ public class ContainerGoalEvaluatorFactory implements IGoalEvaluatorFactory {
 			if (node instanceof StaticConstantAccess) {
 				firstArgument = this.getMethodArgument((StaticConstantAccess) node);
 			} else if (node instanceof Scalar) {
-				firstArgument = this.getMethodArgument((StaticConstantAccess) node);
+				firstArgument = this.getMethodArgument((Scalar) node);
 			}
 			if (firstArgument == null) {
 				return null;
@@ -149,6 +150,7 @@ public class ContainerGoalEvaluatorFactory implements IGoalEvaluatorFactory {
 	 * @param factoryMethodFlags
 	 * @return NULL if the argument can't be resolved to a class name
 	 */
+	@SuppressWarnings("restriction")
 	private String getMethodArgument(Scalar argument) {
 		if (argument.getScalarType() != Scalar.TYPE_STRING) {
 			return null;
@@ -157,6 +159,7 @@ public class ContainerGoalEvaluatorFactory implements IGoalEvaluatorFactory {
 		if (value == null || value.length() == 0) {
 			return null;
 		}
-		return value;
+
+		return org.eclipse.php.internal.core.compiler.ast.parser.ASTUtils.stripQuotes(value);
 	}
 }
