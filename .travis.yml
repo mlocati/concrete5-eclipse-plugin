@@ -16,3 +16,6 @@ install:
 
 script:
   - mvn clean install -DskipTests=true -Dmaven.javadoc.skip=true --batch-mode --show-version
+
+notifications:
+  email: false
