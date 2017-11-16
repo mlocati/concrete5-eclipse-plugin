@@ -60,4 +60,11 @@
 		</factory>
 	</extension>
 
+	<extension
+		point="org.eclipse.php.core.phpIndexingVisitors">
+		<visitor
+			class="org.concrete5.core.index.Concrete5IndexingVisitorExtension">
+		</visitor>
+	</extension>
+
 </plugin>
