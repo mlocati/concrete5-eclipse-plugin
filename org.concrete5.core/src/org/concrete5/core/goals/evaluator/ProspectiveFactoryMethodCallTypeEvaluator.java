@@ -12,6 +12,7 @@ import org.eclipse.dltk.ti.types.ClassType;
 import org.eclipse.dltk.ti.types.IEvaluatedType;
 import org.eclipse.php.core.compiler.ast.nodes.PHPCallExpression;
 import org.eclipse.php.internal.core.typeinference.evaluators.MethodCallTypeEvaluator;
+import org.eclipse.php.core.compiler.ast.nodes.NamespaceReference;
 
 @SuppressWarnings("restriction")
 public class ProspectiveFactoryMethodCallTypeEvaluator extends MethodCallTypeEvaluator {
@@ -161,7 +162,7 @@ public class ProspectiveFactoryMethodCallTypeEvaluator extends MethodCallTypeEva
 		if (className == null || className.isEmpty()) {
 			return false;
 		}
-		String cn = className.charAt(0) == '\\' ? className.substring(1) : className;
+		String cn = className.charAt(0) == NamespaceReference.NAMESPACE_SEPARATOR ? className.substring(1) : className;
 		return className != null && ("Concrete\\Core\\Application\\Application".equalsIgnoreCase(cn) //$NON-NLS-1$
 				|| "Illuminate\\Container\\Container".equalsIgnoreCase(cn)); //$NON-NLS-1$
 
@@ -186,11 +187,13 @@ public class ProspectiveFactoryMethodCallTypeEvaluator extends MethodCallTypeEva
 		if (Character.isUpperCase(this.methodArgument.charAt(0))) {
 			return this.methodArgument;
 		}
-		if (this.methodArgument.length() > 1 && this.methodArgument.charAt(0) == '\\') {
+		if (this.methodArgument.length() > 1
+				&& this.methodArgument.charAt(0) == NamespaceReference.NAMESPACE_SEPARATOR) {
 			if (Character.isUpperCase(this.methodArgument.charAt(1))) {
 				return this.methodArgument;
 			}
-			if (this.methodArgument.length() > 2 && this.methodArgument.charAt(1) == '\\') {
+			if (this.methodArgument.length() > 2
+					&& this.methodArgument.charAt(1) == NamespaceReference.NAMESPACE_SEPARATOR) {
 				if (Character.isUpperCase(this.methodArgument.charAt(2))) {
 					return this.methodArgument;
 				}
