@@ -8,3 +8,11 @@ jdk:
 cache:
   directories:
     - $HOME/.m2
+before_cache:
+  - rm -rf $HOME/.m2/repository/org/concrete5
+
+install:
+  - echo Install step.
+
+script:
+  - mvn clean install -DskipTests=true -Dmaven.javadoc.skip=true --batch-mode --show-version
