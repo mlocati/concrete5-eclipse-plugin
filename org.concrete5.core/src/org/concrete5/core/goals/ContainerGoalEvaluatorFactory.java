@@ -103,17 +103,12 @@ public class ContainerGoalEvaluatorFactory implements IGoalEvaluatorFactory {
 			if (node instanceof PHPDocTag) {
 				continue;
 			}
-			if (firstArgument != null) {
-				return null;
-			}
 			if (node instanceof StaticConstantAccess) {
 				firstArgument = this.getMethodArgument((StaticConstantAccess) node);
 			} else if (node instanceof Scalar) {
 				firstArgument = this.getMethodArgument((Scalar) node);
 			}
-			if (firstArgument == null) {
-				return null;
-			}
+			break;
 		}
 		return firstArgument;
 	}
@@ -148,7 +143,7 @@ public class ContainerGoalEvaluatorFactory implements IGoalEvaluatorFactory {
 	 * @param argument
 	 *            The argument to be parsed
 	 * @param factoryMethodFlags
-	 * @return NULL if the argument can't be resolved to a class name
+	 * @return NULL if the argument can't be resolved to a non-empty string
 	 */
 	@SuppressWarnings("restriction")
 	private String getMethodArgument(Scalar argument) {
@@ -160,6 +155,7 @@ public class ContainerGoalEvaluatorFactory implements IGoalEvaluatorFactory {
 			return null;
 		}
 
-		return org.eclipse.php.internal.core.compiler.ast.parser.ASTUtils.stripQuotes(value);
+		value = org.eclipse.php.internal.core.compiler.ast.parser.ASTUtils.stripQuotes(value);
+		return value.length() == 0 ? null : value;
 	}
 }

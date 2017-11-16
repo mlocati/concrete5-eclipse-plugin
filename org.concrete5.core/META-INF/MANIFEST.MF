@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: concrete5 Core Plugin
 Bundle-SymbolicName: org.concrete5.core;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.2.0.qualifier
 Bundle-Activator: org.concrete5.core.Concrete5CorePlugin
 Bundle-Vendor: https://mlocati.github.io
 Require-Bundle: org.eclipse.ui,
@@ -14,3 +14,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.dltk
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
+Export-Package: org.concrete5.core,
+ org.concrete5.core.builder,
+ org.concrete5.core.facet,
+ org.concrete5.core.goals,
+ org.concrete5.core.goals.evaluator
+Bundle-ClassPath: .
