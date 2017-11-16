@@ -23,6 +23,7 @@
 	</modules>
 
 	<properties>
+		<new-version>1.2.0</new-version>
 		<tycho-version>1.0.0</tycho-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<eclipse.name>oxygen</eclipse.name>
@@ -62,6 +63,21 @@
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-versions-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>set-version</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<newVersion>${new-version}-SNAPSHOT</newVersion>
+				</configuration>
+			</plugin> 
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-maven-plugin</artifactId>
