@@ -5,11 +5,17 @@ import java.util.List;
 
 import org.concrete5.core.Common;
 import org.concrete5.core.factory.FactoryMethod;
+import org.concrete5.core.storage.FactoryMethodStorage;
+import org.concrete5.core.storage.FactoryMethodStorageFactory;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.dltk.ast.ASTNode;
 import org.eclipse.dltk.ast.declarations.TypeDeclaration;
 import org.eclipse.dltk.ast.expressions.CallArgumentsList;
 import org.eclipse.dltk.ast.expressions.Expression;
 import org.eclipse.dltk.ast.references.SimpleReference;
+import org.eclipse.dltk.core.IScriptProject;
+import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.index2.IIndexingRequestor.ReferenceInfo;
 import org.eclipse.php.core.compiler.ast.nodes.ArrayCreation;
 import org.eclipse.php.core.compiler.ast.nodes.ArrayElement;
@@ -29,20 +35,61 @@ public class Concrete5IndexingVisitorExtension extends PHPIndexingVisitorExtensi
 	private final static String OVERRIDE_FUNCTION = "override"; //$NON-NLS-1$
 	private final static String MAP_FUNCTION = "map"; //$NON-NLS-1$
 
-	private int concrete5FacetDetected = 0;
+	private SourceModuleData sourceModuleData = null;
 	private boolean isInMetaNamespace = false;
 
-	private boolean isConcrete5Facet() {
-		if (this.concrete5FacetDetected != 0) {
-			return this.concrete5FacetDetected == 1;
+	private class SourceModuleData {
+		public final IProject project;
+		public final boolean hasConcrete5Nature;
+		public final String sourceModulePath;
+		public final FactoryMethodStorage factoryMethodStorage;
+
+		public SourceModuleData(IProject project, boolean hasConcrete5Nature, String sourceModulePath) {
+			this.project = project;
+			this.hasConcrete5Nature = hasConcrete5Nature;
+			this.sourceModulePath = sourceModulePath;
+			if (this.project == null) {
+				this.factoryMethodStorage = null;
+			} else {
+				this.factoryMethodStorage = FactoryMethodStorageFactory.getForProject(this.project);
+			}
 		}
-		this.concrete5FacetDetected = Common.hasConcrete5Nature(this.sourceModule) ? 1 : -1;
-		return this.concrete5FacetDetected == 1;
+	}
+
+	public void setSourceModule(ISourceModule module) {
+		super.setSourceModule(module);
+		IProject project = null;
+		boolean hasConcrete5Nature = false;
+		String sourceModulePath = null;
+		if (module != null) {
+			IScriptProject scriptProject = module.getScriptProject();
+			if (scriptProject != null) {
+				project = scriptProject.getProject();
+				if (project != null) {
+					hasConcrete5Nature = Common.hasConcrete5Nature(project);
+				}
+			}
+			IPath path = module.getPath();
+			if (path != null) {
+				sourceModulePath = path.toPortableString();
+				if (sourceModulePath != null && sourceModulePath.isEmpty()) {
+					sourceModulePath = null;
+				}
+			}
+			this.sourceModuleData = new SourceModuleData(project, hasConcrete5Nature, sourceModulePath);
+			if (sourceModulePath != null && this.sourceModuleData.factoryMethodStorage != null) {
+				this.sourceModuleData.factoryMethodStorage.resetForPath(sourceModulePath);
+			}
+		}
 	}
 
 	public boolean visit(TypeDeclaration type) throws Exception {
-		if (type instanceof NamespaceDeclaration && this.isConcrete5Facet()) {
-			this.isInMetaNamespace = NAMESPACE_NAME.equals(type.getName());
+		if (type instanceof NamespaceDeclaration) {
+			String namespaceName = type.getName();
+			if (namespaceName != null && namespaceName.equals(NAMESPACE_NAME) && this.sourceModuleData != null
+					&& this.sourceModuleData.hasConcrete5Nature) {
+				this.isInMetaNamespace = true;
+			}
 		}
 		return true;
 	}
@@ -61,6 +108,9 @@ public class Concrete5IndexingVisitorExtension extends PHPIndexingVisitorExtensi
 		FactoryMethod factoryMethod = this.extractFactoryMethod((PHPCallExpression) node);
 		if (factoryMethod == null) {
 			return;
+		}
+		if (this.sourceModuleData.factoryMethodStorage != null) {
+			this.sourceModuleData.factoryMethodStorage.addFactoryMethod(factoryMethod);
 		}
 	}
 
@@ -85,10 +135,11 @@ public class Concrete5IndexingVisitorExtension extends PHPIndexingVisitorExtensi
 		}
 		FullyQualifiedReference fqr = (FullyQualifiedReference) receiver;
 		String factoryClass = fqr.getFullyQualifiedName();
-		if (factoryClass == null || factoryClass.isEmpty()
+		if (factoryClass == null || factoryClass.length() < 2
 				|| factoryClass.charAt(0) != NamespaceReference.NAMESPACE_SEPARATOR) {
 			return null;
 		}
+		factoryClass = factoryClass.substring(1);
 		SimpleReference factoryMethodSR = factory.getCallName();
 		String factoryMethod = factoryMethodSR == null ? null : factoryMethodSR.getName();
 		if (factoryMethod == null || factoryMethod.isEmpty()) {
@@ -115,9 +166,12 @@ public class Concrete5IndexingVisitorExtension extends PHPIndexingVisitorExtensi
 		if (discrimintatorIndex < 0) {
 			return null;
 		}
-		return this.extractMappings(
-				new FactoryMethod(factoryClass, factoryMethod, discrimintatorIndex, FactoryMethod.TYPE_INSTANCEMETHOD),
-				map);
+		SourceModuleData sourceModuleData = this.sourceModuleData;
+		if (sourceModuleData.sourceModulePath == null) {
+			return null;
+		}
+		return this.extractMappings(new FactoryMethod(sourceModuleData.sourceModulePath, factoryClass, factoryMethod,
+				discrimintatorIndex, FactoryMethod.TYPE_INSTANCEMETHOD), map);
 	}
 
 	private FactoryMethod extractMappings(FactoryMethod factoryMethod, PHPCallExpression map) {
@@ -175,7 +229,7 @@ public class Concrete5IndexingVisitorExtension extends PHPIndexingVisitorExtensi
 						String className = ((FullyQualifiedReference) dispatcher).getFullyQualifiedName();
 						if (className != null && className.length() > 1
 								&& className.charAt(0) == NamespaceReference.NAMESPACE_SEPARATOR) {
-							factoryMethod.aliases.put(key, className);
+							factoryMethod.aliases.put(key, className.substring(1));
 							somethingFound = true;
 						}
 					}
