@@ -68,7 +68,7 @@ git remote add deploy "https://${GUTHUB_ACCESS_TOKEN}@github.com/${REPO_OWNER}/$
 rm --recursive --force "${TARGET_PATH}"
 
 # Copy the new update site contents
-cp --recursive --verbose "../${SOURCE_PATH}" "${TARGET_PATH}"
+cp --recursive "../${SOURCE_PATH}" "${TARGET_PATH}"
 
 # Add all the new files to git index
 git add --all "${TARGET_PATH}"
