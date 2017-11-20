@@ -3,7 +3,8 @@
       id="org.concrete5.feature"
       label="concrete5 Plugin"
       version="1.3.0.qualifier"
-      provider-name="https://mlocati.github.io">
+      provider-name="https://mlocati.github.io"
+      plugin="org.concrete5.core">
 
    <description url="https://mlocati.github.io/concrete5-eclipse-plugin">
       An Eclipse plugin for concrete5
