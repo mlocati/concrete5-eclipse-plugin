@@ -11,11 +11,16 @@ cache:
 before_cache:
   - rm -rf $HOME/.m2/repository/org/concrete5
 
+env:
+  global:
+    - secure: GlBB3YIRASB76RBvR65eueiFIdqHwO0zk/lyjIcQ7RFxjQDKz8ikOCkthmFSK+8Koyt1ZhLN5ukO0cPOureh8IvVPlqY6bhn1mh7RhmcDBmgv8k7Eg5kn7qcpiUOi4UrhEL7kObZoYl87o5RXO3kQTFphrQ05QXKhCcMd1wS7Y7oSPjDdPWHR9kp0sYeJtYH+9pQeqO6gPhur/lgKxG+kMykmIQuXUZ/5DzTcXaJpD/E6MXMtowCLJCwNlZ7RTZMd+QNUHfgXZrPa/p03PCzagcCw7DtFpSecCoBH3B7dwZNzOA4s7WShf5K//p6lD3JSmKpwqUrxleVRv4fLQESm5kXU+fTfs7LbJx+HEXtGitRt6DlHJro+k7WOYmCMJ97wEzRL/ALzSc56cD0h0jKfS6EEepIsX7g1UfwZWuRK09UK70x+2GCbpDIxIzmLAAF7PRcah6Bnfb7YpaGiKoYTdDBvJ8EcYoQXZu8+8Ieoxesdcmkn3QVavtDYtFeVUFpPKEfVMsmdmHZOHcLnUn5bcLIXfCx4NRTozfGrp2q/0DEOkS2TfrSjlVGT/xTtrCN97702Cj8uRW8705X5eQcZYLQGP+iG+58p2TyeQfRAoQZUDMxK6KdJaki7VpU8t7zMHRt9uMEloAptxUfJvwLD/D86z+LU9pKNPyF6Ri8ckc=
+
 install:
-  - echo Install step.
+  - true
 
 script:
   - mvn clean install -DskipTests=true -Dmaven.javadoc.skip=true --batch-mode --show-version
+  - ./.travis-deploy.sh
 
 notifications:
   email: false
