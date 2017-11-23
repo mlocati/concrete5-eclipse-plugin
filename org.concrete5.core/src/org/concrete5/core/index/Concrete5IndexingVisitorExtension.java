@@ -3,10 +3,9 @@ package org.concrete5.core.index;
 import java.util.Collection;
 import java.util.List;
 
-import org.concrete5.core.Common;
+import org.concrete5.core.builder.ProjectData;
+import org.concrete5.core.builder.ProjectDataFactory;
 import org.concrete5.core.factory.FactoryMethod;
-import org.concrete5.core.storage.FactoryMethodStorage;
-import org.concrete5.core.storage.FactoryMethodStorageFactory;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.dltk.ast.ASTNode;
@@ -39,46 +38,36 @@ public class Concrete5IndexingVisitorExtension extends PHPIndexingVisitorExtensi
 	private boolean isInMetaNamespace = false;
 
 	private class SourceModuleData {
-		public final IProject project;
-		public final boolean hasConcrete5Nature;
+		public final ProjectData projectData;
 		public final String sourceModulePath;
-		public final FactoryMethodStorage factoryMethodStorage;
 
-		public SourceModuleData(IProject project, boolean hasConcrete5Nature, String sourceModulePath) {
-			this.project = project;
-			this.hasConcrete5Nature = hasConcrete5Nature;
+		public SourceModuleData(IProject project, String sourceModulePath) {
+			this.projectData = ProjectDataFactory.get(project);
 			this.sourceModulePath = sourceModulePath;
-			if (this.project == null) {
-				this.factoryMethodStorage = null;
-			} else {
-				this.factoryMethodStorage = FactoryMethodStorageFactory.getForProject(this.project);
-			}
 		}
 	}
 
 	public void setSourceModule(ISourceModule module) {
 		super.setSourceModule(module);
-		IProject project = null;
-		boolean hasConcrete5Nature = false;
 		String sourceModulePath = null;
+		this.sourceModuleData = null;
 		if (module != null) {
 			IScriptProject scriptProject = module.getScriptProject();
 			if (scriptProject != null) {
-				project = scriptProject.getProject();
+				IProject project = scriptProject.getProject();
 				if (project != null) {
-					hasConcrete5Nature = Common.hasConcrete5Nature(project);
+					IPath path = module.getPath();
+					if (path != null) {
+						sourceModulePath = path.toPortableString();
+						if (sourceModulePath != null && sourceModulePath.isEmpty()) {
+							sourceModulePath = null;
+						}
+					}
+					this.sourceModuleData = new SourceModuleData(project, sourceModulePath);
+					if (sourceModulePath != null) {
+						this.sourceModuleData.projectData.getFactoryMethodStorage().resetForPath(sourceModulePath);
+					}
 				}
-			}
-			IPath path = module.getPath();
-			if (path != null) {
-				sourceModulePath = path.toPortableString();
-				if (sourceModulePath != null && sourceModulePath.isEmpty()) {
-					sourceModulePath = null;
-				}
-			}
-			this.sourceModuleData = new SourceModuleData(project, hasConcrete5Nature, sourceModulePath);
-			if (sourceModulePath != null && this.sourceModuleData.factoryMethodStorage != null) {
-				this.sourceModuleData.factoryMethodStorage.resetForPath(sourceModulePath);
 			}
 		}
 	}
@@ -87,7 +76,8 @@ public class Concrete5IndexingVisitorExtension extends PHPIndexingVisitorExtensi
 		if (type instanceof NamespaceDeclaration) {
 			String namespaceName = type.getName();
 			if (namespaceName != null && namespaceName.equals(NAMESPACE_NAME) && this.sourceModuleData != null
-					&& this.sourceModuleData.hasConcrete5Nature) {
+					&& this.sourceModuleData.sourceModulePath != null
+					&& this.sourceModuleData.projectData.hasConcrete5Nature()) {
 				this.isInMetaNamespace = true;
 			}
 		}
@@ -109,9 +99,7 @@ public class Concrete5IndexingVisitorExtension extends PHPIndexingVisitorExtensi
 		if (factoryMethod == null) {
 			return;
 		}
-		if (this.sourceModuleData.factoryMethodStorage != null) {
-			this.sourceModuleData.factoryMethodStorage.addFactoryMethod(factoryMethod);
-		}
+		this.sourceModuleData.projectData.getFactoryMethodStorage().addFactoryMethod(factoryMethod);
 	}
 
 	private FactoryMethod extractFactoryMethod(PHPCallExpression call) {

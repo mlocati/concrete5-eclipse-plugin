@@ -11,59 +11,42 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.concrete5.core.Common;
 import org.concrete5.core.Concrete5CorePlugin;
+import org.concrete5.core.builder.ProjectData;
 import org.concrete5.core.factory.FactoryMethod;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 
 public class FactoryMethodStorage {
 
 	private final static FactoryMethod[] emptyList = new FactoryMethod[0];
-	private IProject project = null;
+	private ProjectData projectData = null;
 	private FactoryMethod[] factoryMethods;
-	private Boolean concrete5NatureFlag;
 
-	public FactoryMethodStorage(IProject project) {
-		this.project = project;
-		this.reset();
-	}
-
-	public void dispose() {
-		this.reset();
-		this.project = null;
-	}
-
-	public void projectChanged() {
-		this.reset();
+	public FactoryMethodStorage(ProjectData projectData) {
+		this.projectData = projectData;
 	}
 
 	public FactoryMethod[] getAllFactoryMethods() {
 		if (this.factoryMethods != null) {
 			return this.factoryMethods;
 		}
-		if (this.hasConcrete5Nature() == false) {
+		ObjectInputStream stream = this.getStorageInput();
+		if (stream == null) {
 			this.factoryMethods = FactoryMethodStorage.emptyList;
 		} else {
-			ObjectInputStream stream = this.getStorageInput();
-			if (stream == null) {
+			try {
+				this.factoryMethods = (FactoryMethod[]) stream.readObject();
+			} catch (ClassNotFoundException | IOException e) {
 				this.factoryMethods = FactoryMethodStorage.emptyList;
-			} else {
+			} finally {
 				try {
-					this.factoryMethods = (FactoryMethod[]) stream.readObject();
-				} catch (ClassNotFoundException | IOException e) {
-					this.factoryMethods = FactoryMethodStorage.emptyList;
-				} finally {
-					try {
-						stream.close();
-					} catch (Throwable foo) {
-					}
+					stream.close();
+				} catch (Throwable foo) {
 				}
-				if (this.factoryMethods == null) {
-					this.factoryMethods = FactoryMethodStorage.emptyList;
-				}
+			}
+			if (this.factoryMethods == null) {
+				this.factoryMethods = FactoryMethodStorage.emptyList;
 			}
 		}
 
@@ -71,13 +54,15 @@ public class FactoryMethodStorage {
 	}
 
 	public void addFactoryMethod(FactoryMethod factoryMethod) {
-		if (this.hasConcrete5Nature() == false) {
-			return;
-		}
 		FactoryMethod[] currentList = this.getAllFactoryMethods();
 		FactoryMethod[] newList = Arrays.copyOf(currentList, currentList.length + 1);
 		newList[currentList.length] = factoryMethod;
 		this.setFactoryMethods(newList);
+	}
+
+	public void removeAllFactoryMethods() {
+		this.setFactoryMethods(new FactoryMethod[0]);
+		this.factoryMethods = null;
 	}
 
 	private void setFactoryMethods(FactoryMethod[] newList) {
@@ -110,8 +95,7 @@ public class FactoryMethodStorage {
 		this.factoryMethods = newList;
 	}
 
-	public void resetForPath(String path)
-	{
+	public void resetForPath(String path) {
 		if (path == null) {
 			return;
 		}
@@ -129,32 +113,31 @@ public class FactoryMethodStorage {
 		if (newSize == currentList.length) {
 			return;
 		}
-		FactoryMethod[] newArray = new FactoryMethod[newSize];  
+		FactoryMethod[] newArray = new FactoryMethod[newSize];
 		this.setFactoryMethods(newList.toArray(newArray));
 	}
 
-	private boolean hasConcrete5Nature() {
-		if (this.concrete5NatureFlag == null) {
-			this.concrete5NatureFlag = new Boolean(Common.hasConcrete5Nature(this.project));
+	public void renameForPath(String oldFilename, String newFilename) {
+		FactoryMethod[] currentList = this.getAllFactoryMethods();
+		if (currentList.length == 0) {
+			return;
 		}
-		return this.concrete5NatureFlag.booleanValue();
-	}
+		boolean changed = false;
+		for (int i = currentList.length - 1; i >= 0; i--) {
+			if (currentList[i].definerResourcePath.equals(oldFilename)) {
+				changed = true;
+				currentList[i].definerResourcePath = newFilename;
+			}
+		}
+		if (!changed) {
+			return;
+		}
+		this.setFactoryMethods(currentList);
 
-	private void reset() {
-		this.factoryMethods = null;
-		this.concrete5NatureFlag = null;
 	}
 
 	private File getStorageFile() {
-		Concrete5CorePlugin plugin = Concrete5CorePlugin.getDefault();
-		if (plugin == null) {
-			return null;
-		}
-		IPath stateLocation = plugin.getStateLocation();
-		if (stateLocation == null) {
-			return null;
-		}
-		File file = stateLocation.append(this.project.getFullPath()).append("factoryMethods").toFile();
+		File file = this.projectData.getDataPath().append("factoryMethods").toFile();
 		return file;
 	}
 

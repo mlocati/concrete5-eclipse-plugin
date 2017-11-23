@@ -1,9 +1,7 @@
 package org.concrete5.core;
 
-import org.concrete5.core.builder.Concrete5Nature;
+import org.concrete5.core.builder.ProjectDataFactory;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectNature;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.dltk.core.IScriptProject;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.ti.IContext;
@@ -26,26 +24,6 @@ public class Common {
 	}
 
 	/**
-	 * Check if a project has the concrete5 nature.
-	 *
-	 * @param project
-	 *            The project to be checked
-	 * @return Return true if the project has a concrete5 nature, false otherwise
-	 */
-	public static boolean hasConcrete5Nature(IProject project) {
-		if (project == null) {
-			return false;
-		}
-		IProjectNature nature;
-		try {
-			nature = project.getNature(Concrete5Nature.NATURE_ID);
-		} catch (CoreException e) {
-			nature = null;
-		}
-		return nature != null && nature instanceof Concrete5Nature;
-	}
-
-	/**
 	 * Check if a script project has the concrete5 nature.
 	 *
 	 * @param scriptProject
@@ -54,7 +32,14 @@ public class Common {
 	 *         otherwise
 	 */
 	public static boolean hasConcrete5Nature(IScriptProject scriptProject) {
-		return scriptProject != null && hasConcrete5Nature(scriptProject.getProject());
+		if (scriptProject == null) {
+			return false;
+		}
+		IProject project = scriptProject.getProject();
+		if (project == null) {
+			return false;
+		}
+		return ProjectDataFactory.get(project).hasConcrete5Nature();
 	}
 
 	/**

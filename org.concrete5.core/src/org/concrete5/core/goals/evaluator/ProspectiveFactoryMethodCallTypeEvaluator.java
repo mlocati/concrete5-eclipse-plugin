@@ -32,16 +32,14 @@ public class ProspectiveFactoryMethodCallTypeEvaluator extends MethodCallTypeEva
 
 	private int state = STATE_INIT;
 	private List<FactoryMethod> prospectiveFactoryMethods;
-	private int sourceStart;
 	private String[] methodArguments;
 	private IEvaluatedType result;
 
 	public ProspectiveFactoryMethodCallTypeEvaluator(ExpressionTypeGoal goal,
-			List<FactoryMethod> prospectiveFactoryMethods, String[] methodArguments, int sourceStart) {
+			List<FactoryMethod> prospectiveFactoryMethods, String[] methodArguments) {
 		super(goal);
 		this.prospectiveFactoryMethods = prospectiveFactoryMethods;
 		this.methodArguments = methodArguments;
-		this.sourceStart = sourceStart;
 	}
 
 	@Override
@@ -113,7 +111,7 @@ public class ProspectiveFactoryMethodCallTypeEvaluator extends MethodCallTypeEva
 							resultingClass = null;
 						}
 						if (resultingClass != null && goalState != GoalState.PRUNED) {
-							this.result = new PHPClassType("\\".concat(resultingClass)); //$NON-NLS-1$ 
+							this.result = new PHPClassType("\\".concat(resultingClass)); //$NON-NLS-1$
 						}
 					}
 				}

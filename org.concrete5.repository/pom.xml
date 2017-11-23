@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>org.concrete5</groupId>
 		<artifactId>org.concrete5</artifactId>
-		<version>1.3.0-SNAPSHOT</version>
+		<version>1.4.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>org.concrete5.repository</artifactId>

@@ -3,10 +3,10 @@ package org.concrete5.core.goals;
 import java.util.List;
 
 import org.concrete5.core.Common;
+import org.concrete5.core.builder.ProjectDataFactory;
 import org.concrete5.core.factory.FactoryMethod;
 import org.concrete5.core.goals.evaluator.ProspectiveFactoryMethodCallTypeEvaluator;
 import org.concrete5.core.storage.FactoryMethodStorage;
-import org.concrete5.core.storage.FactoryMethodStorageFactory;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.dltk.ast.ASTNode;
 import org.eclipse.dltk.ast.expressions.CallArgumentsList;
@@ -58,7 +58,7 @@ public class ContainerGoalEvaluatorFactory implements IGoalEvaluatorFactory {
 			return null;
 		}
 		return new ProspectiveFactoryMethodCallTypeEvaluator((ExpressionTypeGoal) goal, prospectiveFactoryMethods,
-				stringArguments, expression.sourceStart());
+				stringArguments);
 	}
 
 	/**
@@ -102,7 +102,7 @@ public class ContainerGoalEvaluatorFactory implements IGoalEvaluatorFactory {
 		if (project == null) {
 			return null;
 		}
-		FactoryMethodStorage fmStorage = FactoryMethodStorageFactory.getForProject(project);
+		FactoryMethodStorage fmStorage = ProjectDataFactory.get(project).getFactoryMethodStorage();
 		List<FactoryMethod> result = fmStorage.getFactoryMethodsByMethodName(methodName,
 				FactoryMethod.TYPE_INSTANCEMETHOD);
 		return result.size() == 0 ? null : result;
@@ -164,17 +164,21 @@ public class ContainerGoalEvaluatorFactory implements IGoalEvaluatorFactory {
 			return null;
 		}
 		ISourceModule sourceModule = ((ISourceModuleContext) context).getSourceModule();
-		IModelAccessCache cache = (context instanceof IModelCacheContext) ? ((IModelCacheContext) context).getCache() : null;
+		IModelAccessCache cache = (context instanceof IModelCacheContext) ? ((IModelCacheContext) context).getCache()
+				: null;
 		IType[] types;
 		try {
-			types = PHPModelUtils.getTypes(/* typeName */ localClassName, /* sourceModule */sourceModule, /* offset */argument.sourceStart(), /* cache */ cache, /* monitor */ null, /* isType */true, /* isGlobal */ false);
+			types = PHPModelUtils.getTypes(/* typeName */ localClassName, /* sourceModule */sourceModule,
+					/* offset */argument.sourceStart(), /* cache */ cache, /* monitor */ null, /* isType */true,
+					/* isGlobal */ false);
 		} catch (ModelException $x) {
 			types = null;
 		}
 		if (types == null || types.length != 1 || !(types[0] instanceof SourceType)) {
 			return null;
 		}
-		String fullyQualifiedName = ((SourceType) types[0]).getTypeQualifiedName(NamespaceReference.NAMESPACE_DELIMITER);
+		String fullyQualifiedName = ((SourceType) types[0])
+				.getTypeQualifiedName(NamespaceReference.NAMESPACE_DELIMITER);
 		if (fullyQualifiedName == null || fullyQualifiedName.length() == 0) {
 			return null;
 		}
