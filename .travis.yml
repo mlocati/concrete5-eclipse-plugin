@@ -10,6 +10,7 @@ cache:
     - $HOME/.m2
 before_cache:
   - rm -rf $HOME/.m2/repository/org/concrete5
+  - rm -rf $HOME/.m2/repository/.cache/tycho/p2-repository-metadata
 
 env:
   global:
