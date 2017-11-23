@@ -1,3 +1,5 @@
+[![TravisCI Build Status](https://travis-ci.org/mlocati/concrete5-eclipse-plugin.svg?branch=master)](https://travis-ci.org/mlocati/concrete5-eclipse-plugin)
+
 # concrete5 Eclipse plugin
 
 I've always been quite tired to explicitly tell Eclipse what's the result of `$app->make()` / `Core::make()` calls.
