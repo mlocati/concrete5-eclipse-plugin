@@ -50,11 +50,6 @@
 			<url>http://download.eclipse.org/tools/pdt/updates/${pdt.version}/</url>
 		</repository>
 		<repository>
-			<id>orbit</id>
-			<layout>p2</layout>
-			<url>http://download.eclipse.org/tools/orbit/downloads/drops/R20150519210750/repository/</url>
-		</repository>
-		<repository>
 			<id>indexing</id>
 			<layout>p2</layout>
 			<url>${indexing.url}</url>
@@ -63,6 +58,24 @@
 
 	<build>
 		<plugins>
+			<!-- Enable the Tycho plugin -->
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<extensions>true</extensions>
+			</plugin>
+			<!-- Enable the Tycho plugin for maven goals -->
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-compiler-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+			<!-- Sets the version of the current project and child projects with the same version, and updates references as necessary. -->
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-versions-plugin</artifactId>
@@ -77,22 +90,8 @@
 				<configuration>
 					<newVersion>${new-version}-SNAPSHOT</newVersion>
 				</configuration>
-			</plugin> 
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-maven-plugin</artifactId>
-				<version>${tycho-version}</version>
-				<extensions>true</extensions>
 			</plugin>
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-compiler-plugin</artifactId>
-				<version>${tycho-version}</version>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-				</configuration>
-			</plugin>
+			<!-- Define the set of artifacts from which Tycho resolves the project's dependencies -->
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>target-platform-configuration</artifactId>
@@ -133,55 +132,6 @@
 					</environments>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>1.8</version>
-				<executions>
-					<execution>
-						<id>parse-version</id>
-						<goals>
-							<goal>parse-version</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<artifactId>maven-deploy-plugin</artifactId>
-					<configuration>
-						<skip>true</skip>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 	</build>
-	<profiles>
-		<profile>
-			<id>release</id>
-			<activation>
-				<property>
-					<name>release</name>
-					<value>true</value>
-				</property>
-			</activation>
-			<properties>
-				<bintray.package>release</bintray.package>
-			</properties>
-		</profile>
-		<profile>
-			<id>nightly</id>
-			<activation>
-				<property>
-					<name>release</name>
-					<value>false</value>
-				</property>
-			</activation>
-			<properties>
-				<bintray.package>nightly</bintray.package>
-			</properties>
-		</profile>
-	</profiles>
 </project>
