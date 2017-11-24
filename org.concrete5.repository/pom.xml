@@ -21,7 +21,7 @@
 			<!-- Include the template files to the target repository -->
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.6</version>
+				<version>3.0.2</version>
 				<executions>
 					<execution>
 						<id>copy-p2-index</id>

@@ -30,7 +30,6 @@
 		<release>false</release>
 		<pdt.version>latest-nightly</pdt.version>
 		<dltk.version>latest-nightly</dltk.version>
-		<indexing.url>https://mlocati.github.io/concrete5-eclipse-plugin/updatesite</indexing.url>
 	</properties>
 
 	<repositories>
@@ -48,11 +47,6 @@
 			<id>pdt</id>
 			<layout>p2</layout>
 			<url>http://download.eclipse.org/tools/pdt/updates/${pdt.version}/</url>
-		</repository>
-		<repository>
-			<id>indexing</id>
-			<layout>p2</layout>
-			<url>${indexing.url}</url>
 		</repository>
 	</repositories>
 
@@ -91,7 +85,7 @@
 					<newVersion>${new-version}-SNAPSHOT</newVersion>
 				</configuration>
 			</plugin>
-			<!-- Define the set of artifacts from which Tycho resolves the project's dependencies -->
+			<!-- Define the target runtime environment -->
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>target-platform-configuration</artifactId>

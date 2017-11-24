@@ -39,7 +39,7 @@ SOFTWARE.
    </license>
 
    <url>
-      <update url="https://mlocati.github.io/concrete5-eclipse-plugin/updatesite"/>
+      <update url="https://mlocati.github.io/concrete5-eclipse-plugin/p2"/>
       <discovery label="concrete5 plugin update site" url="https://mlocati.github.io/concrete5-eclipse-plugin"/>
    </url>
 

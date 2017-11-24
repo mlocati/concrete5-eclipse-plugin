@@ -11,7 +11,7 @@ set -o nounset
 SOURCE_BRANCH='master'
 SOURCE_PATH='org.concrete5.repository/target/repository'
 TARGET_BRANCH='gh-pages'
-TARGET_PATH='updatesite'
+TARGET_PATH='p2'
 
 # Check that the source directory exists
 if [ ! -d "${SOURCE_PATH}" ]; then
