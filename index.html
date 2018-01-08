@@ -38,7 +38,7 @@
                 </div>
                 <div class="row">
                     <div class="col-lg-4">
-                        <h2>Get Eclipse</h2>
+                        <h2>1. Get Eclipse</h2>
                         <ol>
                             <li>Go to the <a href="http://download.eclipse.org/eclipse/downloads/" target="_blank">Eclipse Project Downloads</a></li>
                             <li>Click the last build in the latest download section (<b>4.7.1a</b> at the time of writing)</li>
@@ -47,7 +47,7 @@
                         </ol>
                     </div>
                     <div class="col-lg-4">
-                        <h2>Install the plugin</h2>
+                        <h2>2. Install the plugin</h2>
                         <ol>
                             <li>Open Eclipse</li>
                             <li>Choose the <b>Help</b> &rarr; <b>Install New Software...</b> menu</li>
@@ -57,7 +57,28 @@
                         </ol>
                     </div>
                     <div class="col-lg-4">
-                        <h2>Write code!</h2>
+                        <h2>3. Add your concrete5 project to concrete5</h2>
+                        <p>Add your existing project(s) to Eclipse, or creating a new concrete5 project (you can also use Composer if you install the great <b>PHP Development Tools (PDT) Composer Support</b> plugin)</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <h2>4. Activate the plugin</h2>
+                        <ol>
+                            <li>In Eclipse, right click your project in the <b>PHP Explorer</b> View and choose <b>Properties</b></li>
+                            <li>In the <b>Project Facets</b> section check the <b>concrete5</b> check box</li>
+                        </ol>
+                    </div>
+                    <div class="col-lg-4">
+                        <h2>5. Build the IDE symbols</h2>
+                        <ol>
+                            <li>open a terminal/command prompt shell</li>
+                            <li>execute the <code>concrete/bin/concrete5 c5:ide-symbols</code> CLI command (use <code>\</code> instead of <code>/</code> under Windows)</li>
+                            <li>refresh your project in Eclipse (right-click it in the <b>PHP Explorer</b> View and choose <b>Refresh</b>)
+                        </ol>
+                    </div>
+                    <div class="col-lg-4">
+                        <h2>6. Write code!</h2>
 						<img src="images/type-inference-snippet.png" />
                         <p></p>
                     </div>
