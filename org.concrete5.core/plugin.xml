@@ -55,8 +55,8 @@
 	<extension
 		point="org.eclipse.php.core.goalEvaluatorFactories">
 		<factory
-			class="org.concrete5.core.goals.ContainerGoalEvaluatorFactory"
-			priority="100">
+			class="org.concrete5.core.goals.GoalEvaluatorFactory"
+			priority="200">
 		</factory>
 	</extension>
 
