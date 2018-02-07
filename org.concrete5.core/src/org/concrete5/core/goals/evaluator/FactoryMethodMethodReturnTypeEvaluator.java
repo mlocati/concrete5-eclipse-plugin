@@ -94,8 +94,21 @@ public class FactoryMethodMethodReturnTypeEvaluator extends GoalEvaluator {
 			return null;
 		}
 		String methodArgument = methodArguments[factoryMethod.discrimintatorIndex];
-		if (methodArgument == null || methodArgument.length() == 0) {
+		int methodArgumentLength = methodArgument == null ? 0 :  methodArgument.length();
+		if (methodArgumentLength == 0) {
 			return null;
+		}
+		char methodArgumentStart = methodArgument.charAt(0);
+		if (methodArgumentStart == '\'' || methodArgumentStart == '"') {
+			if (methodArgumentLength == 1) {
+				return null;
+			}
+			if (methodArgument.charAt(methodArgumentLength-1) == methodArgumentStart) {
+				if (methodArgumentLength == 2) {
+					return null;
+				}
+				methodArgument = methodArgument.substring(1, methodArgumentLength - 1);
+			}
 		}
 		String resultingClass = null;
 		if (factoryMethod.aliases.containsKey(methodArgument)) {
