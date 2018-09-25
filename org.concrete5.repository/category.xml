@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/org.concrete5.feature_2.1.0.qualifier.jar" id="org.concrete5.feature" version="2.1.0.qualifier">
+   <feature url="features/org.concrete5.feature_2.2.0.qualifier.jar" id="org.concrete5.feature" version="2.2.0.qualifier">
       <category name="frameworks"/>
    </feature>
    <category-def name="frameworks" label="Frameworks / Content Management"/>
