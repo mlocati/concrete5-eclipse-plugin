@@ -26,10 +26,8 @@
 		<new-version>2.0.0</new-version>
 		<tycho-version>1.0.0</tycho-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<eclipse.name>oxygen</eclipse.name>
+		<eclipse.name>photon</eclipse.name>
 		<release>false</release>
-		<pdt.version>latest-nightly</pdt.version>
-		<dltk.version>latest-nightly</dltk.version>
 	</properties>
 
 	<repositories>
@@ -37,16 +35,6 @@
 			<id>eclipse</id>
 			<layout>p2</layout>
 			<url>http://download.eclipse.org/releases/${eclipse.name}</url>
-		</repository>
-		<repository>
-			<id>dltk</id>
-			<layout>p2</layout>
-			<url>http://download.eclipse.org/technology/dltk/updates-dev/${dltk.version}/</url>
-		</repository>
-		<repository>
-			<id>pdt</id>
-			<layout>p2</layout>
-			<url>http://download.eclipse.org/tools/pdt/updates/${pdt.version}/</url>
 		</repository>
 	</repositories>
 
