@@ -1,3 +1,4 @@
+/org.concrete5.core/bin/
 .settings/
 target/
 .classpath
