@@ -14,9 +14,5 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.dltk
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
-Export-Package: org.concrete5.core,
- org.concrete5.core.builder,
- org.concrete5.core.facet,
- org.concrete5.core.goals,
- org.concrete5.core.goals.evaluator
 Bundle-ClassPath: .
+Automatic-Module-Name: org.concrete5.core
