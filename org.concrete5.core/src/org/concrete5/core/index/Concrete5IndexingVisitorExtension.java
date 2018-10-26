@@ -199,13 +199,12 @@ public class Concrete5IndexingVisitorExtension extends PHPIndexingVisitorExtensi
 					continue;
 				}
 				String value = ASTUtils.stripQuotes(scalarValue.getValue());
-				if (key.isEmpty()) {
-					if ("@".equals(value)) { //$NON-NLS-1$
-						factoryMethod.generateClasses = true;
-						somethingFound = true;
+				if (!value.isEmpty()) {
+					if (key.isEmpty()) {
+						factoryMethod.fallbackAlias = value;
+					} else {
+						factoryMethod.aliases.put(key, value);
 					}
-				} else if (!value.isEmpty()) {
-					factoryMethod.aliases.put(key, value);
 					somethingFound = true;
 				}
 			} else if (elementValue instanceof StaticConstantAccess) {
@@ -217,7 +216,11 @@ public class Concrete5IndexingVisitorExtension extends PHPIndexingVisitorExtensi
 						String className = ((FullyQualifiedReference) dispatcher).getFullyQualifiedName();
 						if (className != null && className.length() > 1
 								&& className.charAt(0) == NamespaceReference.NAMESPACE_SEPARATOR) {
-							factoryMethod.aliases.put(key, className.substring(1));
+							if (key.isEmpty()) {
+								factoryMethod.fallbackAlias = className.substring(1);
+							} else {
+								factoryMethod.aliases.put(key, className.substring(1));
+							}
 							somethingFound = true;
 						}
 					}

@@ -1,5 +1,6 @@
 package org.concrete5.core.goals.evaluator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.concrete5.core.builder.ProjectDataFactory;
@@ -10,6 +11,8 @@ import org.eclipse.dltk.core.IScriptProject;
 import org.eclipse.dltk.core.IType;
 import org.eclipse.dltk.core.ITypeHierarchy;
 import org.eclipse.dltk.core.ModelException;
+import org.eclipse.dltk.evaluation.types.AmbiguousType;
+import org.eclipse.dltk.evaluation.types.MultiTypeType;
 import org.eclipse.dltk.ti.GoalState;
 import org.eclipse.dltk.ti.IContext;
 import org.eclipse.dltk.ti.ISourceModuleContext;
@@ -20,6 +23,7 @@ import org.eclipse.php.core.compiler.ast.nodes.NamespaceReference;
 import org.eclipse.php.internal.core.typeinference.IModelAccessCache;
 import org.eclipse.php.internal.core.typeinference.PHPClassType;
 import org.eclipse.php.internal.core.typeinference.PHPModelUtils;
+import org.eclipse.php.internal.core.typeinference.PHPSimpleTypes;
 import org.eclipse.php.internal.core.typeinference.PHPTypeInferenceUtils;
 import org.eclipse.php.internal.core.typeinference.context.IModelCacheContext;
 import org.eclipse.php.internal.core.typeinference.goals.FactoryMethodMethodReturnTypeGoal;
@@ -59,15 +63,11 @@ public class FactoryMethodMethodReturnTypeEvaluator extends GoalEvaluator {
 		return this.result;
 	}
 
-	private PHPClassType calculateReult() {
+	private IEvaluatedType calculateReult() {
 		this.typedGoal = (FactoryMethodMethodReturnTypeGoal) this.goal;
 		IContext context = goal.getContext();
 		this.sourceModuleContext = (context instanceof ISourceModuleContext) ? (ISourceModuleContext) context : null;
 		this.contextCache = (context instanceof IModelCacheContext) ? ((IModelCacheContext) context).getCache() : null;
-		String[] methodArguments = this.typedGoal.getArgNames();
-		if (methodArguments == null || methodArguments.length == 0) {
-			return null;
-		}
 		this.prospectiveFactoryMethods = this.getProspectiveFactoryMethods();
 		if (prospectiveFactoryMethods == null) {
 			return null;
@@ -90,23 +90,25 @@ public class FactoryMethodMethodReturnTypeEvaluator extends GoalEvaluator {
 		if (factoryMethod == null) {
 			return null;
 		}
-		if (factoryMethod.discrimintatorIndex >= methodArguments.length) {
+		String[] methodArguments = this.typedGoal.getArgNames();
+		String methodArgument = null;
+		if (methodArguments != null) {
+			if (factoryMethod.discrimintatorIndex < methodArguments.length) {
+				methodArgument = methodArguments[factoryMethod.discrimintatorIndex];
+			}
+		}
+		String alias;
+		if (methodArgument == null || methodArgument.length() == 0
+				|| !factoryMethod.aliases.containsKey(methodArgument)) {
+			alias = factoryMethod.fallbackAlias;
+		} else {
+			alias = factoryMethod.aliases.get(methodArgument);
+		}
+		if (alias == null || alias.isEmpty()) {
 			return null;
 		}
-		String methodArgument = methodArguments[factoryMethod.discrimintatorIndex];
-		if (methodArgument == null || methodArgument.length() == 0) {
-			return null;
-		}
-		String resultingClass = null;
-		if (factoryMethod.aliases.containsKey(methodArgument)) {
-			resultingClass = factoryMethod.aliases.get(methodArgument);
-		} else if (factoryMethod.generateClasses) {
-			resultingClass = methodArgument;
-		}
-		if (resultingClass == null) {
-			return null;
-		}
-		return new PHPClassType("\\".concat(resultingClass)); //$NON-NLS-1$
+		String[] aliases = alias.split("\\|");
+		return this.resolveAlias(aliases, methodArgument);
 	}
 
 	/**
@@ -210,5 +212,68 @@ public class FactoryMethodMethodReturnTypeEvaluator extends GoalEvaluator {
 		}
 
 		return null;
+	}
+
+	private IEvaluatedType resolveAlias(String[] aliases, String methodArgument) {
+		if (aliases == null || aliases.length == 0) {
+			return null;
+		}
+		ArrayList<IEvaluatedType> types = new ArrayList<IEvaluatedType>(aliases.length);
+		for (String alias : aliases) {
+			IEvaluatedType type = this.resolveAlias(alias, methodArgument);
+			if (type != null) {
+				types.add(type);
+			}
+		}
+		int numTypes = types.size();
+		switch (numTypes) {
+		case 0:
+			return null;
+		case 1:
+			return types.get(0);
+		default:
+			IEvaluatedType[] typeArray = new IEvaluatedType[numTypes];
+			for (int typeIndex = 0; typeIndex < numTypes; typeIndex++) {
+				typeArray[typeIndex] = types.get(typeIndex);
+			}
+			return new AmbiguousType(typeArray);
+		}
+	}
+
+	private IEvaluatedType resolveAlias(String alias, String methodArgument) {
+		int len = alias.length();
+		if (alias.isEmpty()) {
+			return null;
+		}
+		boolean isArray = len >= 2 && alias.endsWith("[]");
+		if (isArray) {
+			alias = alias.substring(0, len - 2);
+			if (alias.isEmpty()) {
+				return null;
+			}
+		}
+		String resultingClass = null;
+		if (alias.equals("@")) {
+			if (methodArgument == null || methodArgument.isEmpty()) {
+				return null;
+			}
+			resultingClass = methodArgument;
+		} else {
+			resultingClass = alias;
+		}
+		IEvaluatedType type = PHPSimpleTypes.fromString(resultingClass);
+		if (type == null) {
+			if (resultingClass.charAt(0) != NamespaceReference.NAMESPACE_SEPARATOR) {
+				resultingClass = NamespaceReference.NAMESPACE_DELIMITER.concat(resultingClass);
+			}
+			type = new PHPClassType(resultingClass);
+		}
+		if (!isArray) {
+			return type;
+		}
+		MultiTypeType arrayType = new MultiTypeType();
+		arrayType.addType(type);
+
+		return arrayType;
 	}
 }
