@@ -110,10 +110,23 @@ public class Concrete5IndexingVisitorExtension extends PHPIndexingVisitorExtensi
 		List<ASTNode> args = argsList == null ? null : argsList.getChilds();
 		int numArgs = args == null ? 0 : args.size();
 
-		if (numArgs == 2 && args.get(0) instanceof StaticMethodInvocation && args.get(1) instanceof PHPCallExpression) {
-			return this.extractFactoryMethod((StaticMethodInvocation) args.get(0), (PHPCallExpression) args.get(1));
+		if (numArgs == 2) {
+			if (args.get(0) instanceof StaticMethodInvocation && args.get(1) instanceof PHPCallExpression) {
+				return this.extractFactoryMethod((StaticMethodInvocation) args.get(0), (PHPCallExpression) args.get(1));
+			}
+			if (args.get(0) instanceof PHPCallExpression && args.get(1) instanceof PHPCallExpression) {
+				return this.extractFactoryMethod((PHPCallExpression) args.get(0), (PHPCallExpression) args.get(1));
+			}
 		}
 		return null;
+	}
+
+	private FactoryMethod extractFactoryMethod(PHPCallExpression factory, PHPCallExpression map) {
+		SimpleReference name = factory.getCallName();
+		if (!(name instanceof FullyQualifiedReference)) {
+			return null;
+		}
+		return this.extractFactoryMethod(factory, "", name.getName(), map);
 	}
 
 	private FactoryMethod extractFactoryMethod(StaticMethodInvocation factory, PHPCallExpression map) {
@@ -133,6 +146,11 @@ public class Concrete5IndexingVisitorExtension extends PHPIndexingVisitorExtensi
 		if (factoryMethod == null || factoryMethod.isEmpty()) {
 			return null;
 		}
+		return this.extractFactoryMethod(factory, factoryClass, factoryMethod, map);
+	}
+
+	private FactoryMethod extractFactoryMethod(PHPCallExpression factory, String factoryClass, String factoryMethod, PHPCallExpression map)
+	{
 		CallArgumentsList argsList = factory.getArgs();
 		if (argsList == null) {
 			return null;

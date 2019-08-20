@@ -86,6 +86,9 @@ public class FactoryMethodMethodReturnTypeEvaluator extends GoalEvaluator {
 					}
 				}
 			}
+			if (factoryMethod == null && evaluatedType == null && types == null) {
+				factoryMethod = this.getFactoryMethod("");
+			}
 		}
 		if (factoryMethod == null) {
 			return null;
@@ -119,6 +122,12 @@ public class FactoryMethodMethodReturnTypeEvaluator extends GoalEvaluator {
 		if (methodName == null || methodName.isEmpty()) {
 			return null;
 		}
+		if (methodName.charAt(0) == NamespaceReference.NAMESPACE_SEPARATOR) {
+			methodName = methodName.substring(1);
+			if (methodName.isEmpty()) {
+				return null;
+			}
+		}
 		if (this.sourceModuleContext == null) {
 			return null;
 		}
@@ -138,11 +147,16 @@ public class FactoryMethodMethodReturnTypeEvaluator extends GoalEvaluator {
 
 	private FactoryMethod getFactoryMethod(String className) {
 		if (className == null || className.isEmpty()) {
-			return null;
-		}
-		for (FactoryMethod fm : this.prospectiveFactoryMethods) {
-			if (fm.className.equalsIgnoreCase(className)) {
-				return fm;
+			for (FactoryMethod fm : this.prospectiveFactoryMethods) {
+				if (fm.className.isEmpty()) {
+					return fm;
+				}
+			}
+		} else {
+			for (FactoryMethod fm : this.prospectiveFactoryMethods) {
+				if (fm.className.equalsIgnoreCase(className)) {
+					return fm;
+				}
 			}
 		}
 		return null;
